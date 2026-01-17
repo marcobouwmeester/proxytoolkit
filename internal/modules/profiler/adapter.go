@@ -1,6 +1,7 @@
 package profiler
 
 import (
+	"context"
 	"net/http"
 	"os"
 	"time"
@@ -9,17 +10,35 @@ import (
 	"github.com/marcobouwmeester/proxytoolkit/internal/adapters"
 )
 
+type ctxKey string
+
+const REQUEST_START_KEY ctxKey = "request-start-time"
+
 type timeLoggerProps struct {
-	start  time.Time
 	logger *log.Logger
 }
 
 func (t *timeLoggerProps) onRequest(req *http.Request) {
-	t.start = time.Now()
+	ctx := context.WithValue(
+		req.Context(),
+		REQUEST_START_KEY,
+		time.Now(),
+	)
+
+	*req = *req.WithContext(ctx)
 }
 
 func (t *timeLoggerProps) onResponse(req *http.Request, res *http.Response) {
-	duration := time.Since(t.start)
+	startTime := req.Context().Value(REQUEST_START_KEY)
+	if startTime == nil {
+		t.logger.Warn(
+			"missing start time",
+			"path", req.RequestURI,
+			"method", req.Method,
+		)
+		return
+	}
+	duration := time.Since(startTime.(time.Time))
 
 	t.logger.Info(
 		req.RequestURI,
