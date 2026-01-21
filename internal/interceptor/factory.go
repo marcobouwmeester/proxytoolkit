@@ -18,7 +18,7 @@ func (p InterceptorFactoryProps) New() *[]adapters.InterceptionAdapter {
 		adapters = append(adapters, profiler.New())
 	}
 	if p.Cfg.GenerateBrunoConfig {
-		adapters = append(adapters, bruno.New())
+		adapters = append(adapters, bruno.New(*p.Cfg))
 	}
 	return &adapters
 }

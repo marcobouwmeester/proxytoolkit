@@ -3,27 +3,39 @@ package bruno
 import (
 	"net/http"
 
+	"github.com/charmbracelet/log"
 	"github.com/marcobouwmeester/proxytoolkit/internal/adapters"
+	"github.com/marcobouwmeester/proxytoolkit/internal/config"
 )
 
-type brunoProps struct{}
-
-func (b brunoProps) OnRequest(req *http.Request) {
-	// to be implemented
+type brunoProps struct {
+	Cfg config.Config
 }
 
-func (b brunoProps) OnResponse(req *http.Request, res *http.Response) {
-	// to be implemented
+func (b brunoProps) OnRequest(req *http.Request) {
+	if err := HandleRequest(req, b.Cfg); err != nil {
+		log.Error("error handling request")
+	}
 }
 
 /**
  * Should be implemented
  */
-func New() adapters.InterceptionAdapter {
-	bruno := &brunoProps{}
+func New(cfg config.Config) adapters.InterceptionAdapter {
+	bruno := &brunoProps{
+		Cfg: cfg,
+	}
+
+	err := CreateBrunoConfigIfNotExists(cfg)
+	if err != nil {
+		log.Fatal("Error creating bruno config", err)
+	}
+
+	if err := CreateCollectionBruIfNotExists(cfg); err != nil {
+		log.Fatal("Error creating collection.bru", err)
+	}
 
 	return adapters.InterceptionAdapter{
-		OnRequest:  bruno.OnRequest,
-		OnResponse: bruno.OnResponse,
+		OnRequest: bruno.OnRequest,
 	}
 }

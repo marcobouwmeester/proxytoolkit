@@ -1,0 +1,4 @@
+vars:pre-request {
+  baseUrl: {{.BaseURL}}
+  {{if .BearerToken}}token: {{.BearerToken}}{{end}}
+}

@@ -1,0 +1,15 @@
+meta {
+  name: {{.Meta.Name}}
+  type: {{.Meta.Type}}
+  seq: {{.Meta.Seq}}
+}
+
+{{.Request.Method}} {
+  url: {{"{{baseUrl}}"}}{{.Request.URL}}
+  body: {{.Body.Type}}{{if and (ne .Body.Type "none") (ne .Body.Raw "")}} {{.Body.Raw}}{{end}}{{if .Request.Auth}}
+  auth: {{.Request.Auth}}{{end}}
+}
+
+settings {
+  encodeUrl: {{.Settings.EncodeURL}}
+}

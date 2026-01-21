@@ -1,0 +1,11 @@
+{
+  "version": "{{.Version}}",
+  "name": "{{.Name}}",
+  "type": "{{.Type}}",
+  "ignore": [
+    {{- range $i, $v := .Ignore }}
+    {{- if $i}},{{ end }}
+    "{{$v}}"
+    {{- end }}
+  ]
+}
